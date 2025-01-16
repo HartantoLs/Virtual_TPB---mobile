@@ -148,6 +148,7 @@ const GLBDistanceGame: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <Text style={styles.title2}>VIRTUAL TPB</Text>
       <Navbar />
       <View style={styles.container}>
         <Text style={styles.title}>GLB Distance Game</Text>
@@ -247,6 +248,15 @@ const GLBDistanceGame: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  title2: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#00ADB5',
+    marginTop: 40,
+    marginBottom: 20,
+    letterSpacing: 5,
+    textAlign: 'center',
+    },
   scrollContainer: {
     flexGrow: 1,
     backgroundColor: '#222831',

@@ -12,6 +12,7 @@ const VideoScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title2}>VIRTUAL TPB</Text>
       <Navbar />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Video Pembelajaran</Text>
@@ -32,6 +33,15 @@ const VideoScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  title2: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#00ADB5',
+    marginTop: 40,
+    marginBottom: 20,
+    letterSpacing: 5,
+    textAlign: 'center',
+    },
   container: {
     flex: 1,
     backgroundColor: '#222831',
