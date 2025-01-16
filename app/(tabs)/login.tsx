@@ -1,24 +1,43 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, useWindowDimensions, Alert, Pressable } from 'react-native';
+import { View, Text, TextInput, Pressable, StyleSheet, Alert, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
+import { loginUser } from '../firebasefunction'; // Pastikan path sesuai dengan lokasi file firebaseFunctions.ts
+import { auth } from '../firebaseconfig'; // Import konfigurasi Firebase
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [isHovered, setIsHovered] = useState(false);
   const { width } = useWindowDimensions();
   const router = useRouter();
 
   const isTablet = width >= 768 && width < 1024;
   const isDesktop = width >= 1024;
 
-  const handleLogin = () => {
-    if (username && password) {
-      setErrorMessage('');
-      router.push('/dashboard');
-    } else {
-      setErrorMessage('Please enter both username and password.');
+  const handleLogin = async () => {
+    try {
+      if (username && password) {
+        setErrorMessage('');
+
+        // Login dengan Firebase Authentication
+        await loginUser(username, password);
+
+        // Dapatkan pengguna yang sedang login
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          console.log('User ID:', currentUser.uid); // UID untuk identifikasi
+          console.log('Email:', currentUser.email);
+
+          // Navigasi ke dashboard
+          router.push('/dashboard');
+        } else {
+          throw new Error('Failed to retrieve user after login.');
+        }
+      } else {
+        setErrorMessage('Please enter both username and password.');
+      }
+    } catch (error: any) {
+      setErrorMessage(error.message || 'An error occurred. Please try again.');
     }
   };
 
@@ -59,6 +78,8 @@ const Login: React.FC = () => {
         >
           <Text style={styles.submitButtonText}>Login</Text>
         </Pressable>
+        {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
+        {/* Link untuk registrasi */}
         <Pressable 
           onPress={() => router.push('/register')}
           style={styles.registerLink}
@@ -67,7 +88,6 @@ const Login: React.FC = () => {
             Don't have an account? Register here
           </Text>
         </Pressable>
-        {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
       </View>
     </View>
   );

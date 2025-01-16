@@ -1,31 +1,72 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { auth, firestore } from '../firebaseconfig'; // Pastikan path benar
+import { doc, getDoc } from 'firebase/firestore';
 import Navbar from '../../components/navbar';
+import { loginUser } from '../firebasefunction';
 const { width } = Dimensions.get('window');
 
 export default function Page() {
   const router = useRouter();
   const [animatedValues] = useState(new Array(4).fill(0).map(() => new Animated.Value(0)));
+  const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
-    Animated.stagger(200, animatedValues.map(value =>
-      Animated.spring(value, {
-        toValue: 1,
-        useNativeDriver: true,
-        tension: 50,
-        friction: 7,
-      })
-    )).start();
+    // Animasi saat pertama kali komponen dirender
+    Animated.stagger(
+      200,
+      animatedValues.map(value =>
+        Animated.spring(value, {
+          toValue: 1,
+          useNativeDriver: true,
+          tension: 50,
+          friction: 7,
+        })
+      )
+    ).start();
+
+    // Cek apakah pengguna sudah login
+    const checkLoginStatus = async () => {
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        try {
+          // Query Firestore untuk mendapatkan username berdasarkan UID
+          const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
+          console.log('UID USER ADALAH: ',currentUser.uid);
+          if (userDoc != null) {
+            setUsername(userDoc.data()?.username || 'User');
+            console.log(username)
+          } else {
+            console.log('No such user!');
+            setUsername('No username found');
+          }
+        } catch (error) {
+          console.error('Error fetching username:', error);
+          setUsername('Error fetching username');
+        }
+      } else {
+        // Redirect ke /login jika belum login
+        router.push('/login');
+      }
+    };
+  
+    checkLoginStatus();
   }, []);
+
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
       {/* Hero Section */}
       <View style={styles.heroSection}>
         <Animated.Text style={[styles.heroTitle, { opacity: animatedValues[0] }]}>VIRTUAL TPB</Animated.Text>
-        <Animated.Text style={[styles.heroSubtitle, { opacity: animatedValues[1] }]}>Make You Feel Better</Animated.Text>
+        <Animated.Text style={[styles.heroSubtitle, { opacity: animatedValues[1] }]}>
+          Make You Feel Better
+        </Animated.Text>
+        <Text style={styles.welcomeMessage}>
+          Welcome, {username || 'Loading...'}
+        </Text>
       </View>
 
       {/* Navbar */}
@@ -40,8 +81,9 @@ export default function Page() {
           </Text>
 
           <View style={styles.featuresGrid}>
+            {/* Feature Cards */}
             <FeatureCard
-              href='/materi'
+              href="/materi"
               icon={<Ionicons name="nuclear" size={48} color="#00ADB5" />}
               title="Fisika"
               description="Belajar lebih dalam mengenai materi, soal, dan eksperimen pada fisika"
@@ -135,6 +177,14 @@ function FeatureCard({
 }
 
 const styles = StyleSheet.create({
+  welcomeMessage: {
+    marginTop: 10,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#00ADB5',
+    textAlign: 'center',
+  },
+  
   container: {
     flex: 1,
     backgroundColor: '#222831',
