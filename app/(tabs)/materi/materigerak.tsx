@@ -26,7 +26,6 @@ const MateriGerak: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title2}>VIRTUAL TPB</Text>
-      <Navbar />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Daftar E-Book</Text>
         <MaterialCard
@@ -45,6 +44,7 @@ const MateriGerak: React.FC = () => {
           url="https://www.ruangguru.com/blog/rumus-gerak-parabola"
         />
       </ScrollView>
+      <Navbar />
     </View>
   );
 };

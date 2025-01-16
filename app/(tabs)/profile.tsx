@@ -132,7 +132,6 @@ const Profile: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title2}>VIRTUAL TPB</Text>
-      <Navbar />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>My Profile</Text>
         <View style={styles.profileCard}>
@@ -184,6 +183,9 @@ const Profile: React.FC = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
+      <View style={styles.navbarContainer}>
+        <Navbar />
+      </View>
     </View>
   );
 };
@@ -258,6 +260,13 @@ const styles = StyleSheet.create({
   editButtonText: {
     color: '#EEEEEE',
     fontWeight: 'bold',
+  },
+  navbarContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#222831',
   },
 });
 
