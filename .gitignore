@@ -4,3 +4,12 @@
 
 expo-env.d.ts
 # @end expo-cli
+*.class
+*.lock
+*.xml
+*.bin
+*.jar
+*.len
+/node_modules
+/.expo/web
+/android
