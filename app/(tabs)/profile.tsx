@@ -1,84 +1,38 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity,TouchableWithoutFeedback, TextInput, Alert, ScrollView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { auth, firestore } from '../firebaseconfig';  // Ensure you have Firebase initialized correctly
 import { updateProfile, getAuth, updatePassword as firebaseUpdatePassword, User} from 'firebase/auth'; // For updating username
 import { doc, updateDoc } from 'firebase/firestore'; // For Firestore updates
 import Navbar from '../../components/navbar';
-import firebase from 'firebase/app';
+import { StatusBar } from 'expo-status-bar';
+import { auth, firestore } from '../firebaseconfig';
+import { doc, getDoc } from 'firebase/firestore';
+
 const Profile: React.FC = () => {
-  const [userName, setUserName] = useState('');
-  const [newUserName, setNewUserName] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState<string>('');  // State to store the username
 
-  // Fetch current user data
   useEffect(() => {
-    const user = auth.currentUser;
-    if (user) {
-      setUserName(user.displayName || 'User');  // Display the current username
-    }
+    const fetchUserProfile = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          // Fetch user data from Firestore
+          const userDocRef = doc(firestore, 'users', user.uid);
+          const docSnap = await getDoc(userDocRef);
+
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            setUsername(userData?.username || 'User'); // Set username state
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    fetchUserProfile(); // Fetch the user profile when component mounts
   }, []);
-
-  // Function to update username in Firebase
-  const updateUsername = async () => {
-    setLoading(true);
-    const user = auth.currentUser;
-    if (user && newUserName !== '') {
-      try {
-        // Update username in Firebase Authentication
-        await updateProfile(user, { displayName: newUserName });
-
-        // Update username in Firestore
-        const userDocRef = doc(firestore, 'users', user.uid);
-        await updateDoc(userDocRef, { username: newUserName });
-
-        setUserName(newUserName); // Update local state for username
-        Alert.alert('Success', 'Username has been updated.');
-      } catch (error) {
-        console.error(error);
-        Alert.alert('Error', 'Failed to update username.');
-      } finally {
-        setLoading(false);
-      }
-    } else {   // Type assertion to firebase.User for updatePassword
-      Alert.alert('Error', 'Please enter a new username.');
-    }
-  };
-
-  // Function to update password
-  const updatePassword = async (newPassword: string) => {
-    const auth = getAuth();
-    const user: User | null = auth.currentUser;  // Using the User type from firebase/auth module
-  
-    if (user && newPassword !== '') {
-      try {
-        setLoading(true);
-        // No need for type assertion, just use the User type directly
-        await firebaseUpdatePassword(user, newPassword);  // Correct method for updating password in v9+
-        Alert.alert('Success', 'Password has been updated.');
-      } catch (error) {
-        console.error(error);
-        Alert.alert('Error', 'Failed to update password.');
-      } finally {
-        setLoading(false);
-      }
-    } else {
-      Alert.alert('Error', 'Please enter a new password.');
-    }
-  };
-
-  // Log out function
-  const logOut = async () => {
-    try {
-      await auth.signOut();
-      Alert.alert('Success', 'You have logged out successfully.');
-      // route.push('/login')
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Failed to log out.');
-    }
-  };
 
   return (
     <View style={styles.container}>
@@ -88,30 +42,13 @@ const Profile: React.FC = () => {
         <Text style={styles.title}>My Profile</Text>
         <View style={styles.profileCard}>
           <Ionicons name="person-circle-outline" size={80} color="#00ADB5" />
-          <Text style={styles.profileName}>{userName}</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="New Username"
-            value={newUserName}
-            onChangeText={setNewUserName}
-          />
-          <TouchableOpacity style={styles.editButton} onPress={updateUsername} disabled={loading}>
-            <Text style={styles.editButtonText}>{loading ? 'Updating...' : 'Update Username'}</Text>
-          </TouchableOpacity>
-
-          <TextInput
-            style={styles.input}
-            placeholder="New Password"
-            value={newPassword}
-            onChangeText={setNewPassword}
-            secureTextEntry
-          />
-           <TouchableWithoutFeedback onPress={() => updatePassword(newPassword)}>
-            <Text style={styles.editButtonText}>{loading ? 'Updating...' : 'Update Password'}</Text>
-          </TouchableWithoutFeedback >
-
-          <TouchableOpacity style={styles.editButton} onPress={logOut}>
-            <Text style={styles.editButtonText}>Log Out</Text>
+          {/* Display the dynamic username */}
+          <Text style={styles.profileName}>{username}</Text>
+          <Text style={styles.profileDescription}>
+            A passionate developer, teacher, and small business owner.
+          </Text>
+          <TouchableOpacity style={styles.editButton}>
+            <Text style={styles.editButtonText}>Edit Profile</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
