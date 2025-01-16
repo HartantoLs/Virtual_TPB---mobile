@@ -3,8 +3,9 @@ import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions, Animated } f
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { auth, firestore } from '../firebaseconfig'; // Ensure path is correct
-import { doc, getDoc } from 'firebase/firestore';
 import Navbar from '../../components/navbar';
+import { getFirestore, doc, getDoc, getDocs, collection } from 'firebase/firestore';
+import { getAuth, updatePassword as firebaseUpdatePassword, User } from 'firebase/auth';
 
 const { width } = Dimensions.get('window');
 
@@ -12,8 +13,46 @@ export default function Page() {
   const router = useRouter();
   const [animatedValues] = useState(new Array(4).fill(0).map(() => new Animated.Value(0)));
   const [username, setUsername] = useState<string | null>(null);
+  
+  const fetchUsernameManually = async () => {
+      try {
+        const auth = getAuth();  // Ambil instance auth dari Firebase
+        const user = auth.currentUser;  // Ambil currentUser dari Firebase Authentication
+  
+        if (user) {
+          const db = getFirestore();
+          const usersCollectionRef = collection(db, 'users');
+          const querySnapshot = await getDocs(usersCollectionRef);
+  
+          let foundUsername = null;
+  
+          // Loop manual untuk mencari username berdasarkan userId
+          querySnapshot.forEach((doc) => {
+            const docData = doc.data();
+            // console.log('user id: ', user.uid)
+            if (docData.userId === user.uid) {  // Pencocokan berdasarkan userId
+              foundUsername = docData.username;
+              // console.log(foundUsername);
+            }
+          });
+  
+          if (foundUsername) {
+            setUsername(foundUsername);  // Set username jika ditemukan
+            console.log(username);
+          } else {
+            console.log('No matching userId found.');
+          }
+        } else {
+          console.log('No user is signed in.');
+        }
+      } catch (error) {
+        console.error('Error fetching username manually:', error);
+      }
+    };
 
   useEffect(() => {
+    
+    
     // Animation when the component is rendered
     Animated.stagger(
       200,
@@ -31,18 +70,18 @@ export default function Page() {
     const checkLoginStatus = async () => {
       const currentUser = auth.currentUser;
       if (currentUser) {
-        try {
-          // Fetch the user document from Firestore using the user's UID
-          const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
-          if (userDoc.exists()) {
-            setUsername(userDoc.data()?.username || 'User');
-          } else {
-            setUsername('No username found');
-          }
-        } catch (error) {
-          console.error('Error fetching username:', error);
-          setUsername('Error fetching username');
-        }
+        // try {
+        //   // Fetch the user document from Firestore using the user's UID
+        //   const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
+        //   if (userDoc.exists()) {
+        //     setUsername(userDoc.data()?.username || 'User');
+        //   } else {
+        //     setUsername('No username found');
+        //   }
+        // } catch (error) {
+        //   console.error('Error fetching username:', error);
+        //   setUsername('Error fetching username');
+        // }
       } else {
         // If no user is logged in, redirect to login page
         router.push('/login');
@@ -50,6 +89,17 @@ export default function Page() {
     };
     
     checkLoginStatus();
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if (user) {
+        fetchUsernameManually(); // Memanggil ulang fetch username setelah login
+      } else {
+        setUsername(null); // Reset username jika tidak ada user yang login
+      }
+    });
+
+    return () => unsubscribe();
+   
   }, []);
 
   return (

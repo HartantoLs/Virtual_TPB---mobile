@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Dimensions, Modal, ScrollView, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Dimensions, Modal, ScrollView, FlatList, Alert  } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { collection, query, where, getDocs , addDoc, Timestamp} from 'firebase/firestore';
+import { getFirestore, collection, query, where, getDocs , addDoc, Timestamp, deleteDoc, doc } from 'firebase/firestore';
 import { firestore, auth } from '../../firebaseconfig'; // Import konfigurasi Firestore Anda
 import Navbar from '../../../components/navbar';
 
@@ -20,7 +20,7 @@ const GLBDistanceGame: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<'start' | 'win' | 'lose' | 'error'>('start');
   const [gameHistory, setGameHistory] = useState<any[]>([]); // State untuk menyimpan riwayat permainan
-
+  const [showHistory, setShowHistory] = useState(false);
   const simulationWidth = SCREEN_WIDTH * 0.9;
 
   useEffect(() => {
@@ -89,7 +89,28 @@ const GLBDistanceGame: React.FC = () => {
     setShowAlert(true);
     setTimeout(() => setShowAlert(false), 3000);
   };
+  
+  const deleteAllHistory = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const gameHistoryQuery = query(collection(firestore, 'game_history'), where('userId', '==', user.uid));
+        const querySnapshot = await getDocs(gameHistoryQuery);
+        
+        // Hapus setiap riwayat permainan
+        querySnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+        });
 
+        loadGameHistory(); // Memperbarui riwayat permainan setelah penghapusan
+        Alert.alert('Success', 'All game history has been deleted.');
+      }
+    } catch (error) {
+      console.error('Error deleting all game history:', error);
+      Alert.alert('Error', 'Failed to delete all game history.');
+    }
+  };
+  
   const saveGameResult = async (result: string, distanceToFinish: number) => {
     try {
       const user = auth.currentUser;
@@ -124,13 +145,19 @@ const GLBDistanceGame: React.FC = () => {
     }
   };
 
-  const renderHistoryItem = ({ item }: any) => (
-    <View style={styles.historyItem}>
-      <Text style={styles.historyText}>
-        Result: {item.result} | Distance: {item.distanceToFinish} px | Date: {item.timestamp.toDate().toLocaleString()}
-      </Text>
-    </View>
-  );
+  const renderHistoryItem = ({ item }: any) => {
+    // Tentukan warna latar belakang berdasarkan hasil permainan
+    let backgroundColor = item.result === 'win' ? '#4CAF50' : item.result === 'lose' ? '#FFCDD2' : '#222831';
+  
+    return (
+      <View style={[styles.historyItem, { backgroundColor }]}>
+        <Text style={styles.historyText}>
+          Result: {item.result} | Distance: {item.distanceToFinish} px | Date: {item.timestamp.toDate().toLocaleString()}
+        </Text>
+      </View>
+    );
+  };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -231,12 +258,31 @@ const GLBDistanceGame: React.FC = () => {
 
         {/* Bagian untuk menampilkan riwayat permainan */}
         <View style={styles.historyContainer}>
-          <Text style={styles.historyTitle}>Game History</Text>
-          <FlatList
-            data={gameHistory}
-            renderItem={renderHistoryItem}
-            keyExtractor={(item) => item.id}
-          />
+          <TouchableOpacity 
+            style={styles.dropdownButton}
+            onPress={() => setShowHistory(!showHistory)} // Toggle dropdown untuk riwayat
+          >
+            <Text style={styles.dropdownButtonText}>
+              {showHistory ? 'Hide Game History' : 'Show Game History'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Tombol Hapus Semua Riwayat */}
+          <TouchableOpacity
+            style={styles.deleteAllButton}
+            onPress={deleteAllHistory}
+          >
+            <Text style={styles.deleteAllButtonText}>Delete All History</Text>
+          </TouchableOpacity>
+
+          {/* Menampilkan riwayat permainan hanya jika showHistory adalah true */}
+          {showHistory && (
+            <FlatList
+              data={gameHistory}
+              renderItem={renderHistoryItem}
+              keyExtractor={(item) => item.id}
+            />
+          )}
         </View>
       </View>
     </ScrollView>
@@ -245,18 +291,44 @@ const GLBDistanceGame: React.FC = () => {
 
 
 const styles = StyleSheet.create({
+  historyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#00ADB5',
+    marginBottom: 10,
+  },
+
+  dropdownButton: {
+    backgroundColor: '#00ADB5',
+    padding: 15,
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  dropdownButtonText: {
+    color: '#EEEEEE',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  deleteAllButton: {
+    backgroundColor: '#FF4C4C',
+    padding: 10,
+    marginTop: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  deleteAllButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    
+  },
   historyContainer: {
     marginTop: 20,
     width: '100%',
     backgroundColor: '#393E46',
     padding: 15,
     borderRadius: 10,
-  },
-  historyTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#00ADB5',
-    marginBottom: 10,
   },
   historyItem: {
     padding: 10,
@@ -267,6 +339,17 @@ const styles = StyleSheet.create({
   historyText: {
     color: '#FFFFFF',
     fontSize: 16,
+  },
+  deleteButton: {
+    marginTop: 10,
+    backgroundColor: '#FF4C4C',
+    padding: 5,
+    borderRadius: 5,
+  },
+  deleteButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   title2: {
     fontSize: 24,

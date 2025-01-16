@@ -1,39 +1,134 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { auth, firestore } from '../firebaseconfig';  // Ensure you have Firebase initialized correctly
-import { updateProfile, getAuth, updatePassword as firebaseUpdatePassword, User} from 'firebase/auth'; // For updating username
-import { doc, updateDoc } from 'firebase/firestore'; // For Firestore updates
+import { auth } from '../firebaseconfig';  // Pastikan Firebase sudah terinisialisasi dengan benar
+import { getAuth, updatePassword as firebaseUpdatePassword, User } from 'firebase/auth';  // Untuk pembaruan password
 import Navbar from '../../components/navbar';
-import { StatusBar } from 'expo-status-bar';
-import { auth, firestore } from '../firebaseconfig';
-import { doc, getDoc } from 'firebase/firestore';
+import { useRouter } from 'expo-router';
+import { getFirestore, doc, getDoc, getDocs, collection } from 'firebase/firestore';
 
 const Profile: React.FC = () => {
-  const [username, setUsername] = useState<string>('');  // State to store the username
+  const router = useRouter();
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPasswordForm, setShowPasswordForm] = useState(false); // Untuk menampilkan form password baru
+  const [loading, setLoading] = useState(false);
+  const [username, setUsername] = useState<string | null>(null); 
+
+  const fetchUsernameManually = async () => {
+    try {
+      const auth = getAuth();  // Ambil instance auth dari Firebase
+      const user = auth.currentUser;  // Ambil currentUser dari Firebase Authentication
+
+      if (user) {
+        const db = getFirestore();
+        const usersCollectionRef = collection(db, 'users');
+        const querySnapshot = await getDocs(usersCollectionRef);
+
+        let foundUsername = null;
+
+        // Loop manual untuk mencari username berdasarkan userId
+        querySnapshot.forEach((doc) => {
+          const docData = doc.data();
+          // console.log('user id: ', user.uid)
+          if (docData.userId === user.uid) {  // Pencocokan berdasarkan userId
+            foundUsername = docData.username;
+            console.log("found username adalah : ", foundUsername);
+          }
+        });
+
+        if (foundUsername) {
+          setUsername(foundUsername);  // Set username jika ditemukan
+          
+        } else {
+          console.log('No matching userId found.');
+        }
+      } else {
+        console.log('No user is signed in.');
+      }
+    } catch (error) {
+      console.error('Error fetching username manually:', error);
+    }
+  };
+  const fetchUsername = async () => {
+    try {
+      const auth = getAuth();  // Ambil instance auth dari Firebase
+      const user = auth.currentUser;  // Ambil currentUser dari Firebase Authentication
+  
+      if (user) {
+        // Ambil instance Firestore
+        const db = getFirestore();
+        // Ambil dokumen pengguna dari koleksi 'users' berdasarkan user.uid
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        // console.log('data user : ', userDoc.data());
+        if (userDoc.exists()) {
+          
+          setUsername(userDoc.data().username);  // Ambil data username dari dokumen dan simpan ke state
+        } else {
+          console.log('No such username!');
+        }
+      } else {
+        console.log('No user is signed in');
+      }
+    } catch (error) {
+      console.error('Error fetching username:', error);
+    }
+  };
+
+  // Fungsi untuk memperbarui password
+  const updatePassword = async () => {
+    const auth = getAuth();
+    const user: User | null = auth.currentUser;  // Menggunakan tipe User dari firebase/auth module
+
+    // Verifikasi bahwa password baru dan konfirmasi password cocok
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Error', 'Password dan konfirmasi password tidak cocok.');
+      return;
+    }
+
+    if (user && newPassword !== '') {
+      try {
+        setLoading(true);
+        await firebaseUpdatePassword(user, newPassword);  // Menggunakan metode yang benar untuk pembaruan password
+        Alert.alert('Success', 'Password telah diperbarui.');
+        setShowPasswordForm(false); // Menyembunyikan form setelah sukses
+      } catch (error) {
+        console.error(error);
+        Alert.alert('Error', 'Gagal memperbarui password.');
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      Alert.alert('Error', 'Harap masukkan password baru.');
+    }
+  };
+
+  // Fungsi keluar
+  const logOut = async () => {
+    try {
+      await auth.signOut();
+      setUsername(null); 
+      // localStorage.clear(); 
+      // sessionStorage.clear();
+      Alert.alert('Success', 'Anda telah berhasil keluar.');
+      router.push('/login') 
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Gagal keluar.');
+    }
+  };
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const user = auth.currentUser;
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged(user => {
       if (user) {
-        try {
-          // Fetch user data from Firestore
-          const userDocRef = doc(firestore, 'users', user.uid);
-          const docSnap = await getDoc(userDocRef);
-
-          if (docSnap.exists()) {
-            const userData = docSnap.data();
-            setUsername(userData?.username || 'User'); // Set username state
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
+        fetchUsernameManually(); // Memanggil ulang fetch username setelah login
+      } else {
+        setUsername(null); // Reset username jika tidak ada user yang login
       }
-    };
+    });
 
-    fetchUserProfile(); // Fetch the user profile when component mounts
-  }, []);
-
+  }, []);  
   return (
     <View style={styles.container}>
       <Text style={styles.title2}>VIRTUAL TPB</Text>
@@ -42,13 +137,50 @@ const Profile: React.FC = () => {
         <Text style={styles.title}>My Profile</Text>
         <View style={styles.profileCard}>
           <Ionicons name="person-circle-outline" size={80} color="#00ADB5" />
-          {/* Display the dynamic username */}
-          <Text style={styles.profileName}>{username}</Text>
-          <Text style={styles.profileDescription}>
-            A passionate developer, teacher, and small business owner.
-          </Text>
-          <TouchableOpacity style={styles.editButton}>
-            <Text style={styles.editButtonText}>Edit Profile</Text>
+           <Text style={styles.welcomeMessage}>
+                    Welcome, {username || 'Loading...'}
+            </Text>
+          {/* Dropdown untuk membuka form perubahan password */}
+          <TouchableOpacity
+            style={styles.dropdownButton}
+            onPress={() => setShowPasswordForm(!showPasswordForm)} // Toggle form
+          >
+            <Text style={styles.dropdownText}>
+              {showPasswordForm ? 'Cancel' : 'Ganti Password'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Tampilkan form password baru jika dropdown ditekan */}
+          {showPasswordForm && (
+            <>
+              <TextInput
+                style={styles.input}
+                placeholder="New Password"
+                value={newPassword}
+                onChangeText={setNewPassword}
+                secureTextEntry
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Confirm New Password"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+              />
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={updatePassword}
+                disabled={loading}
+              >
+                <Text style={styles.editButtonText}>
+                  {loading ? 'Updating...' : 'Update Password'}
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
+
+          <TouchableOpacity style={styles.editButton} onPress={logOut}>
+            <Text style={styles.editButtonText}>Log Out</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -86,11 +218,12 @@ const styles = StyleSheet.create({
     padding: 20,
     alignItems: 'center',
   },
-  profileName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#EEEEEE',
+  welcomeMessage: {
     marginTop: 10,
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#00ADB5',
+    textAlign: 'center',
   },
   input: {
     width: '80%',
@@ -102,12 +235,25 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#00ADB5',
   },
-  editButton: {
+  dropdownButton: {
+    width: '80%',
     backgroundColor: '#00ADB5',
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 20,
+    borderRadius: 5,
     marginTop: 15,
+  },
+  dropdownText: {
+    color: '#EEEEEE',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  editButton: {
+    backgroundColor: '#FF5733',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginTop: 30,
   },
   editButtonText: {
     color: '#EEEEEE',
