@@ -27,7 +27,6 @@ const Login: React.FC = () => {
         if (currentUser) {
           console.log('User ID:', currentUser.uid); // UID untuk identifikasi
           console.log('Email:', currentUser.email);
-
           // Navigasi ke dashboard
           router.push('/dashboard');
         } else {

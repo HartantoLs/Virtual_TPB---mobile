@@ -34,7 +34,7 @@ export default function Page() {
         try {
           // Query Firestore untuk mendapatkan username berdasarkan UID
           const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
-          console.log('UID USER ADALAH: ',currentUser.uid);
+          // console.log('berhasil : ',userDoc.data())
           if (userDoc != null) {
             setUsername(userDoc.data()?.username || 'User');
             console.log(username)

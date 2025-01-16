@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Dimensions, Modal, ScrollView } from 'react-native';
-// import { Audio } from 'expo-av';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, Image, Dimensions, Modal, ScrollView, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { collection, query, where, getDocs , addDoc, Timestamp} from 'firebase/firestore';
+import { firestore, auth } from '../../firebaseconfig'; // Import konfigurasi Firestore Anda
 import Navbar from '../../../components/navbar';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -14,28 +15,21 @@ const GLBDistanceGame: React.FC = () => {
   const [distance, setDistance] = useState(0);
   const [finishPosition, setFinishPosition] = useState(0);
   const [objectStartPosition, setObjectStartPosition] = useState(0);
-  const [audioPlay, setAudioPlay] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState<'start' | 'win' | 'lose' | 'error'>('start');
+  const [gameHistory, setGameHistory] = useState<any[]>([]); // State untuk menyimpan riwayat permainan
 
-//   const gameSound = useRef(new Audio.Sound());
   const simulationWidth = SCREEN_WIDTH * 0.9;
 
   useEffect(() => {
-    return () => {
-    //   stopMusic();
-    };
+    loadGameHistory(); // Memuat riwayat permainan saat komponen pertama kali dirender
   }, []);
 
   const startGame = async () => {
     setStart(true);
     showCustomAlert("GAME START", 'start');
-
-    // if (!audioPlay) {
-    //   await playGameSound();
-    // }
 
     const newFinishPosition = Math.floor(Math.random() * (0.25 * simulationWidth)) + (0.5 * simulationWidth);
     setFinishPosition(newFinishPosition);
@@ -56,7 +50,6 @@ const GLBDistanceGame: React.FC = () => {
     setDistance(0);
     setFinishPosition(0);
     setObjectStartPosition(0);
-    // stopMusic();
   };
 
   const check = () => {
@@ -72,25 +65,19 @@ const GLBDistanceGame: React.FC = () => {
         return;
       }
 
-        let currentPosition: number = position; 
-        let distanceInput: number = speed * time;
-        let newPosition: number = currentPosition + distanceInput;
-        setPosition(newPosition);
+      let currentPosition: number = position; 
+      let distanceInput: number = speed * time;
+      let newPosition: number = currentPosition + distanceInput;
+      setPosition(newPosition);
 
-        let newDistance: number = finishPosition - newPosition;
-        setDistance(newDistance);
-
+      let newDistance: number = finishPosition - newPosition;
+      setDistance(newDistance);
 
       if (newDistance < 0) {
         showCustomAlert("YOU'VE PASSED THE LINE, GAME OVER", 'lose');
-        // playWinSound();
-        // stopMusic();
         saveGameResult("lose", newDistance);
-        
       } else if (newDistance === 0) {
         showCustomAlert("CONGRATS, YOU'VE WON THE GAME", 'win');
-        
-        // playWrongSound();
         saveGameResult("win", 0);
       }
     }
@@ -103,48 +90,47 @@ const GLBDistanceGame: React.FC = () => {
     setTimeout(() => setShowAlert(false), 3000);
   };
 
-//   const playGameSound = async () => {
-//     try {
-//       await gameSound.current.loadAsync(require('../../../assets/audio/soundTrack.mp3'));
-//       await gameSound.current.playAsync();
-//       gameSound.current.setIsLoopingAsync(true);
-//       setAudioPlay(true);
-//     } catch (error) {
-//       console.error("Error playing game sound:", error);
-//     }
-//   };
-
-//   const stopMusic = async () => {
-//     try {
-//       await gameSound.current.stopAsync();
-//       setAudioPlay(false);
-//     } catch (error) {
-//       console.error("Error stopping music:", error);
-//     }
-//   };
-
-//   const playWinSound = async () => {
-//     try {
-//       const { sound } = await Audio.Sound.createAsync(require('../../../assets/audio/win.mp3'));
-//       await sound.playAsync();
-//     } catch (error) {
-//       console.error("Error playing win sound:", error);
-//     }
-//   };
-
-//   const playWrongSound = async () => {
-//     try {
-//       const { sound } = await Audio.Sound.createAsync(require('../../../assets/audio/wrong.mp3'));
-//       await sound.playAsync();
-//     } catch (error) {
-//       console.error("Error playing wrong sound:", error);
-//     }
-//   };
-
   const saveGameResult = async (result: string, distanceToFinish: number) => {
-    // Implement the logic to save game results
-    console.log("Game result:", result, "Distance to finish:", distanceToFinish);
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        await addDoc(collection(firestore, 'game_history'), {
+          userId: user.uid,
+          result,
+          distanceToFinish,
+          timestamp: Timestamp.now(),
+        });
+        loadGameHistory(); // Perbarui daftar riwayat setelah menyimpan hasil
+      }
+    } catch (error) {
+      console.error("Error saving game result:", error);
+    }
   };
+
+  const loadGameHistory = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const gameHistoryQuery = query(collection(firestore, 'game_history'), where('userId', '==', user.uid));
+        const querySnapshot = await getDocs(gameHistoryQuery);
+        const history = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        setGameHistory(history);
+      }
+    } catch (error) {
+      console.error("Error fetching game history:", error);
+    }
+  };
+
+  const renderHistoryItem = ({ item }: any) => (
+    <View style={styles.historyItem}>
+      <Text style={styles.historyText}>
+        Result: {item.result} | Distance: {item.distanceToFinish} px | Date: {item.timestamp.toDate().toLocaleString()}
+      </Text>
+    </View>
+  );
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -242,12 +228,46 @@ const GLBDistanceGame: React.FC = () => {
             <Text style={styles.alertText}>{alertMessage}</Text>
           </View>
         )}
+
+        {/* Bagian untuk menampilkan riwayat permainan */}
+        <View style={styles.historyContainer}>
+          <Text style={styles.historyTitle}>Game History</Text>
+          <FlatList
+            data={gameHistory}
+            renderItem={renderHistoryItem}
+            keyExtractor={(item) => item.id}
+          />
+        </View>
       </View>
     </ScrollView>
   );
 };
 
+
 const styles = StyleSheet.create({
+  historyContainer: {
+    marginTop: 20,
+    width: '100%',
+    backgroundColor: '#393E46',
+    padding: 15,
+    borderRadius: 10,
+  },
+  historyTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#00ADB5',
+    marginBottom: 10,
+  },
+  historyItem: {
+    padding: 10,
+    backgroundColor: '#222831',
+    marginBottom: 10,
+    borderRadius: 5,
+  },
+  historyText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
   title2: {
     fontSize: 24,
     fontWeight: 'bold',
