@@ -1,74 +1,135 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { useRouter } from 'expo-router';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+const Index: React.FC = () => {
+  const { width, height } = useWindowDimensions();
+  const router = useRouter(); // Gunakan router untuk navigasi
+  const isTablet = width >= 768 && width < 1024;
+  const isDesktop = width >= 1024;
 
-export default function HomeScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <View style={styles.container}>
+      <View style={styles.Index}> 
+        <Text style={[styles.title, isTablet && styles.tabletTitle, isDesktop && styles.desktopTitle]}>
+          VIRTUAL TPB
+        </Text>
+        <Text style={[styles.subtitle, isTablet && styles.tabletSubtitle, isDesktop && styles.desktopSubtitle]}>
+          Explore More Features
+        </Text>
+        <View style={[styles.buttonSec, (isTablet || isDesktop) && styles.buttonSecWide]}>
+          <TouchableOpacity 
+            style={[styles.logButton, (isTablet || isDesktop) && styles.buttonWide]} 
+            onPress={() => router.push('/login')} // Gunakan `router.push` untuk navigasi
+          >
+            <Text style={styles.logButtonText}>Login</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.regButton, (isTablet || isDesktop) && styles.buttonWide]} 
+            onPress={() => router.push('/register')} // Gunakan `router.push` untuk navigasi
+          >
+            <Text style={styles.regButtonText}>Register</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
   );
-}
+};
+
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: '#222831',
+  },
+  Index: {
+    flex: 1,
+    backgroundColor: '#222831',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    padding: 20,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  title: {
+    color: '#00ADB5',
+    fontSize: 28,
+    fontWeight: 'bold',
+    letterSpacing: 15,
+    marginBottom: 10,
+    textAlign: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  tabletTitle: {
+    fontSize: 36,
+    letterSpacing: 20,
+  },
+  desktopTitle: {
+    fontSize: 48,
+    letterSpacing: 30,
+  },
+  subtitle: {
+    color: 'white',
+    fontSize: 14,
+    letterSpacing: 5,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  tabletSubtitle: {
+    fontSize: 18,
+    letterSpacing: 8,
+  },
+  desktopSubtitle: {
+    fontSize: 24,
+    letterSpacing: 10,
+  },
+  buttonSec: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+  },
+  buttonSecWide: {
+    flexDirection: 'row',
+  },
+  logButton: {
+    padding: 15,
+    backgroundColor: 'transparent',
+    borderColor: 'white',
+    borderWidth: 2,
+    borderRadius: 100,
+    width: '80%',
+    maxWidth: 250,
+    margin: 10,
+    alignItems: 'center',
+    opacity: 0.5,
+  },
+  regButton: {
+    padding: 15,
+    backgroundColor: 'transparent',
+    borderColor: '#00ADB5',
+    borderWidth: 2,
+    borderRadius: 100,
+    width: '80%',
+    maxWidth: 250,
+    margin: 10,
+    alignItems: 'center',
+    opacity: 0.7,
+  },
+  buttonWide: {
+    width: '40%',
+    maxWidth: 300,
+  },
+  logButtonText: {
+    color: 'white',
+    fontWeight: '600',
+    letterSpacing: 5,
+    fontSize: 14,
+  },
+  regButtonText: {
+    color: '#00ADB5',
+    fontWeight: '600',
+    letterSpacing: 5,
+    fontSize: 14,
   },
 });
+
+export default Index;
+
