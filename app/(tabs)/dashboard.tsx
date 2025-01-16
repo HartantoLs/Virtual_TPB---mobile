@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Dimensions, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { auth, firestore } from '../firebaseconfig'; // Pastikan path benar
+import { auth, firestore } from '../firebaseconfig'; // Ensure path is correct
 import { doc, getDoc } from 'firebase/firestore';
 import Navbar from '../../components/navbar';
-import { loginUser } from '../firebasefunction';
+
 const { width } = Dimensions.get('window');
 
 export default function Page() {
@@ -14,7 +14,7 @@ export default function Page() {
   const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {
-    // Animasi saat pertama kali komponen dirender
+    // Animation when the component is rendered
     Animated.stagger(
       200,
       animatedValues.map(value =>
@@ -27,19 +27,16 @@ export default function Page() {
       )
     ).start();
 
-    // Cek apakah pengguna sudah login
+    // Check login status and fetch username from Firestore
     const checkLoginStatus = async () => {
       const currentUser = auth.currentUser;
       if (currentUser) {
         try {
-          // Query Firestore untuk mendapatkan username berdasarkan UID
+          // Fetch the user document from Firestore using the user's UID
           const userDoc = await getDoc(doc(firestore, 'users', currentUser.uid));
-          // console.log('berhasil : ',userDoc.data())
-          if (userDoc != null) {
+          if (userDoc.exists()) {
             setUsername(userDoc.data()?.username || 'User');
-            console.log(username)
           } else {
-            console.log('No such user!');
             setUsername('No username found');
           }
         } catch (error) {
@@ -47,14 +44,13 @@ export default function Page() {
           setUsername('Error fetching username');
         }
       } else {
-        // Redirect ke /login jika belum login
+        // If no user is logged in, redirect to login page
         router.push('/login');
       }
     };
-  
+    
     checkLoginStatus();
   }, []);
-
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -144,18 +140,15 @@ function FeatureCard({
   const [isPressed, setIsPressed] = useState(false);
 
   return (
-    <Animated.View style={[
-      styles.featureCard,
-      {
-        transform: [
-          { scale: animatedValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0.8, 1]
-          }) },
-        ],
-        opacity: animatedValue,
-      }
-    ]}>
+    <Animated.View style={[styles.featureCard, {
+      transform: [
+        { scale: animatedValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.8, 1]
+        }) },
+      ],
+      opacity: animatedValue,
+    }]}>
       <Pressable
         onPressIn={() => setIsPressed(true)}
         onPressOut={() => setIsPressed(false)}
@@ -184,29 +177,12 @@ const styles = StyleSheet.create({
     color: '#00ADB5',
     textAlign: 'center',
   },
-  
   container: {
     flex: 1,
     backgroundColor: '#222831',
   },
   contentContainer: {
     padding: 16,
-  },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 15,
-    backgroundColor: 'rgba(57, 62, 70, 0.3)',
-    borderRadius: 25,
-    marginBottom: 20,
-  },
-  navLinkContainer: {
-    paddingHorizontal: 10,
-  },
-  navLink: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '500',
   },
   heroSection: {
     height: 300,
@@ -315,4 +291,3 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
 });
-  

@@ -1,20 +1,47 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Navbar from '../../components/navbar';
 import { StatusBar } from 'expo-status-bar';
+import { auth, firestore } from '../firebaseconfig';
+import { doc, getDoc } from 'firebase/firestore';
 
 const Profile: React.FC = () => {
+  const [username, setUsername] = useState<string>('');  // State to store the username
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          // Fetch user data from Firestore
+          const userDocRef = doc(firestore, 'users', user.uid);
+          const docSnap = await getDoc(userDocRef);
+
+          if (docSnap.exists()) {
+            const userData = docSnap.data();
+            setUsername(userData?.username || 'User'); // Set username state
+          }
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    fetchUserProfile(); // Fetch the user profile when component mounts
+  }, []);
+
   return (
     <View style={styles.container}>
-    <Text style={styles.title2}>VIRTUAL TPB</Text>
+      <Text style={styles.title2}>VIRTUAL TPB</Text>
       <Navbar />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Hero Section */}
         <Text style={styles.title}>My Profile</Text>
         <View style={styles.profileCard}>
           <Ionicons name="person-circle-outline" size={80} color="#00ADB5" />
-          <Text style={styles.profileName}>Your Name</Text>
+          {/* Display the dynamic username */}
+          <Text style={styles.profileName}>{username}</Text>
           <Text style={styles.profileDescription}>
             A passionate developer, teacher, and small business owner.
           </Text>
@@ -28,7 +55,7 @@ const Profile: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-title2: {
+  title2: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#00ADB5',
@@ -36,7 +63,7 @@ title2: {
     marginBottom: 20,
     letterSpacing: 5,
     textAlign: 'center',
-    },
+  },
   container: {
     flex: 1,
     backgroundColor: '#222831',
