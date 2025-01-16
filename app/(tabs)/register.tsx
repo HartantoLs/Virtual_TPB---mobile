@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, useWindowDimensions, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
+import { registerUser } from '../firebasefunction'; 
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,24 +15,17 @@ const Register: React.FC = () => {
 
   const handleRegister = async () => {
     try {
-      const response = await fetch('https://virtual-tpb-puce.vercel.app/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: email, password }),
-      });
+      if (email && password) {
+        setErrorMessage('');
 
-      if (response.ok) {
+        // Fungsi registrasi dengan Firebase
+        await registerUser(email, password, email); // Menggunakan email sebagai username
         router.push('/login');
-      } else if (response.status === 409) {
-        setErrorMessage('Email already exists. Please try again.');
       } else {
-        const error = await response.json();
-        setErrorMessage(error.message || 'Registration failed.');
+        setErrorMessage('Please enter both email and password.');
       }
-    } catch (error) {
-      setErrorMessage('An error occurred while registering.');
+    } catch (error: any) {
+      setErrorMessage(error.message || 'An error occurred while registering.');
     }
   };
 
@@ -65,7 +59,7 @@ const Register: React.FC = () => {
           />
         </View>
         <Pressable 
-          style={({pressed}) => [
+          style={({ pressed }) => [
             styles.submitButton,
             pressed && styles.submitButtonPressed
           ]}
