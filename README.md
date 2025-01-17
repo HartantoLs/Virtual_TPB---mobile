@@ -16,7 +16,7 @@ Virtual TPB adalah aplikasi pembelajaran matkul-matkul TPB, untuk saat ini Virtu
   https://github.com/HartantoLs/Virtual_TPB---mobile  
 
 - **Video**  
-  https://github.com/HartantoLs/Virtual_TPB---mobile  
+  https://youtu.be/BGzg--yPxKQ
 
 ---
 
