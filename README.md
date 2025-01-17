@@ -1,6 +1,6 @@
 # II3140 - Virtual TPB
 
-## Anggota Kelompok
+## Anggota Kelompok 23 K02
 - **Louis Ferdyo Gunawan (18222022)**
 - **Hartanto Luwis (18222064)**
 
