@@ -1,50 +1,43 @@
-# Welcome to your Expo app 👋
+# II3140 - Virtual TPB
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+## Anggota Kelompok
+- **Louis Ferdyo Gunawan (18222022)**
+- **Hartanto Luwis (18222064)**
 
-## Get started
+---
 
-1. Install dependencies
+## Deskripsi Proyek
+Virtual TPB adalah aplikasi pembelajaran matkul-matkul TPB, untuk saat ini Virtual TPB menyediakan materi pembelajaran (bacaan dan video) dan eksperimen virtual lab Fisika yaitu GLB, materi lainnya akan datang nanti 
 
-   ```bash
-   npm install
-   ```
+---
 
-2. Start the app
+## Link Penting
+- **Source Code**  
+  https://github.com/HartantoLs/Virtual_TPB---mobile  
 
-   ```bash
-    npx expo start
-   ```
+- **Video**  
+  https://github.com/HartantoLs/Virtual_TPB---mobile  
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Link Deployment
+- **Aplikasi Web**  
+   https://virtual-tpb-frontend.vercel.app/- 
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **APK untuk Mobile:**  
+  https://expo.dev/artifacts/eas/wdaAQrpCNL65ZVu32dTxnB.apk 
 
-## Get a fresh project
+---
 
-When you're ready, run:
+## Fitur Utama
+1. **Game Eksperimen GLB**     
+2. **Materi Pembelajaran**
+3. **Video Pembelajaran**
 
-```bash
-npm run reset-project
-```
+---
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Panduan Penggunaan
+1. Download APK terlebih dahulu untuk mobile, jika website langsung saja klik atau masukan link pada browser
+2. Daftar, lalu login untuk mengakses fitur-fitur pada virtual lab.
+3. Mulailah mempelajari materi, atau melakukan eksperimen.
+4. Anda dapat melihat histori dari eksperimen yang dilakukan juga pada halaman eksperimen.
