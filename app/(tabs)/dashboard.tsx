@@ -103,70 +103,72 @@ export default function Page() {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.heroSection}>
-          <Animated.Text style={[styles.heroTitle, { opacity: animatedValues[0] }]}>VIRTUAL TPB</Animated.Text>
-          <Animated.Text style={[styles.heroSubtitle, { opacity: animatedValues[1] }]}>
-            Make You Feel Better
-          </Animated.Text>
-          <Text style={styles.welcomeMessage}>
-            Welcome, {username || 'Loading...'}
-          </Text>
-        </View>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      {/* Hero Section */}
+      <View style={styles.heroSection}>
+        <Animated.Text style={[styles.heroTitle, { opacity: animatedValues[0] }]}>VIRTUAL TPB</Animated.Text>
+        <Animated.Text style={[styles.heroSubtitle, { opacity: animatedValues[1] }]}>
+          Make You Feel Better
+        </Animated.Text>
+        <Text style={styles.welcomeMessage}>
+          Welcome, {username || 'Loading...'}
+        </Text>
+      </View>
 
-        <View style={styles.featuresSection}>
-          <View style={styles.featuresCard}>
-            <Text style={styles.featuresTitle}>WELCOME TO VIRTUAL TPB</Text>
-            <Text style={styles.featuresSubtitle}>
-              Membantu meningkatkan pemahaman matkul TPB ITB
-            </Text>
-            <View style={styles.featuresGrid}>
-              <FeatureCard
-                href="/materi"
-                icon={<Ionicons name="nuclear" size={48} color="#00ADB5" />}
-                title="Fisika"
-                description="Belajar lebih dalam mengenai materi, soal, dan eksperimen pada fisika"
-                router={router}
-                animatedValue={animatedValues[2]}
-              />
-              <FeatureCard
-                href="/materi/matematika"
-                icon={<Ionicons name="calculator" size={48} color="#00ADB5" />}
-                title="Matematika"
-                description="Coming Soon"
-                router={router}
-                animatedValue={animatedValues[2]}
-              />
-              <FeatureCard
-                href="/materi/kimia"
-                icon={<Ionicons name="flask" size={48} color="#00ADB5" />}
-                title="Kimia"
-                description="Coming Soon"
-                router={router}
-                animatedValue={animatedValues[3]}
-              />
-              <FeatureCard
-                href="/materi/inggris"
-                icon={<Ionicons name="language" size={48} color="#00ADB5" />}
-                title="Inggris"
-                description="Coming Soon"
-                router={router}
-                animatedValue={animatedValues[3]}
-              />
-            </View>
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Features Section */}
+      <View style={styles.featuresSection}>
+        <View style={styles.featuresCard}>
+          <Text style={styles.featuresTitle}>WELCOME TO VIRTUAL TPB</Text>
+          <Text style={styles.featuresSubtitle}>
+            Membantu meningkatkan pemahaman matkul TPB ITB
+          </Text>
+
+          <View style={styles.featuresGrid}>
+            {/* Feature Cards */}
+            <FeatureCard
+              href="/materi"
+              icon={<Ionicons name="nuclear" size={48} color="#00ADB5" />}
+              title="Fisika"
+              description="Belajar lebih dalam mengenai materi, soal, dan eksperimen pada fisika"
+              router={router}
+              animatedValue={animatedValues[2]}
+            />
+            <FeatureCard
+              href="/materi/matematika"
+              icon={<Ionicons name="calculator" size={48} color="#00ADB5" />}
+              title="Matematika"
+              description="Coming Soon"
+              router={router}
+              animatedValue={animatedValues[2]}
+            />
+            <FeatureCard
+              href="/materi/kimia"
+              icon={<Ionicons name="flask" size={48} color="#00ADB5" />}
+              title="Kimia"
+              description="Coming Soon"
+              router={router}
+              animatedValue={animatedValues[3]}
+            />
+            <FeatureCard
+              href="/materi/inggris"
+              icon={<Ionicons name="language" size={48} color="#00ADB5" />}
+              title="Inggris"
+              description="Coming Soon"
+              router={router}
+              animatedValue={animatedValues[3]}
+            />
           </View>
         </View>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Developed By Hartanto & Louis</Text>
-        </View>
-      </ScrollView>
-
-      <View style={styles.navbarContainer}>
-        <Navbar />
       </View>
-    </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>Developed By Hartanto Luwis</Text>
+      </View>
+    </ScrollView>
   );
 }
 
@@ -218,13 +220,6 @@ function FeatureCard({
 }
 
 const styles = StyleSheet.create({
-  navbarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#222831',
-  },
   welcomeMessage: {
     marginTop: 10,
     fontSize: 16,
@@ -339,7 +334,6 @@ const styles = StyleSheet.create({
   footer: {
     padding: 24,
     alignItems: 'center',
-    marginBottom: 36, 
   },
   footerText: {
     color: '#FFF',

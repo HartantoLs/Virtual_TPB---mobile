@@ -1,14 +1,10 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import Navbar from '../components/navbar';
 
 export default function NotFound() {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Coming Soon  :)</Text>
-      <View style={styles.navbarContainer}>
-        <Navbar />
-      </View>
+      <Text style={styles.text}>404: Page Not Found</Text>
     </View>
   );
 }
@@ -22,12 +18,5 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 20,
     fontWeight: 'bold',
-  },
-  navbarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#222831',
   },
 });

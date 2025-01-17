@@ -162,6 +162,7 @@ const GLBDistanceGame: React.FC = () => {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <Text style={styles.title2}>VIRTUAL TPB</Text>
+      <Navbar />
       <View style={styles.container}>
         <Text style={styles.title}>GLB Distance Game</Text>
         <Text style={styles.subtitle}>Try to Reach The Finish Line</Text>

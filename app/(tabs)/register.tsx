@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    letterSpacing: 11,
+    letterSpacing: 15,
     marginBottom: 40,
     color: 'white',
     textAlign: 'center',

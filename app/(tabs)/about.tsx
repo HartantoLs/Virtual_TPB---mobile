@@ -6,7 +6,8 @@ import Navbar from '../../components/navbar';
 const About: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title2}>VIRTUAL TPB</Text>
+    <Text style={styles.title2}>VIRTUAL TPB</Text>
+      <Navbar />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>About Us</Text>
         <View style={styles.aboutCard}>
@@ -18,15 +19,12 @@ const About: React.FC = () => {
           </Text>
         </View>
       </ScrollView>
-      <View style={styles.navbarContainer}>
-        <Navbar />
-      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  title2: {
+title2: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#00ADB5',
@@ -34,14 +32,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     letterSpacing: 5,
     textAlign: 'center',
-  },
+    },
   container: {
     flex: 1,
     backgroundColor: '#222831',
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100, // Add space at the bottom for the Navbar
   },
   title: {
     fontSize: 24,
@@ -67,13 +64,6 @@ const styles = StyleSheet.create({
     color: '#EEEEEE',
     textAlign: 'center',
     marginTop: 10,
-  },
-  navbarContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: '#222831',
   },
 });
 

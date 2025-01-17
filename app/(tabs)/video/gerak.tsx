@@ -13,6 +13,7 @@ const VideoScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title2}>VIRTUAL TPB</Text>
+      <Navbar />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Video Pembelajaran</Text>
         {videos.map((video) => (
@@ -27,7 +28,6 @@ const VideoScreen: React.FC = () => {
           </View>
         ))}
       </ScrollView>
-      <Navbar />
     </View>
   );
 };
