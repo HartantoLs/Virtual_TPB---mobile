@@ -1,8 +1,6 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "types": ["node", "prop-types"],
-    "typeRoots": ["./node_modules/@types"],
     "target": "ESNext",                // Kompatibel dengan fitur JavaScript terbaru
     "module": "ESNext",                // Menggunakan module system modern
     "jsx": "react-native",             // Konfigurasi khusus untuk React Native
