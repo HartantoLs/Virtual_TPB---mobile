@@ -284,9 +284,7 @@ const GLBDistanceGame: React.FC = () => {
           )}
         </View>
       </View>
-      <Navbar />
     </ScrollView>
-    
   );
 };
 
