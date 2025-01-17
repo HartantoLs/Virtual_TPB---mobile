@@ -1,3 +1,4 @@
+//register
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, useWindowDimensions, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -92,7 +93,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    letterSpacing: 15,
+    letterSpacing: 11,
     marginBottom: 40,
     color: 'white',
     textAlign: 'center',

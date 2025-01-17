@@ -1,10 +1,20 @@
+//materi
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import Navbar from '../../components/navbar';
-const SubjectBox: React.FC<{ title: string; description: string; icon: string; isActive?: boolean; onPressMateri?: () => void; onPressVideo?: () => void; onPressGame?: () => void }> = ({ title, description, icon, isActive = false, onPressMateri, onPressVideo, onPressGame }) => (
+
+const SubjectBox: React.FC<{
+  title: string;
+  description: string;
+  icon: string;
+  isActive?: boolean;
+  onPressMateri?: () => void;
+  onPressVideo?: () => void;
+  onPressGame?: () => void;
+}> = ({ title, description, icon, isActive = false, onPressMateri, onPressVideo, onPressGame }) => (
   <View style={styles.box}>
     <Ionicons name={icon as any} size={48} color="#00ADB5" />
     <Text style={styles.boxTitle}>{title}</Text>
@@ -31,9 +41,6 @@ export default function App() {
       <StatusBar style="auto" />
       <ScrollView contentContainerStyle={styles.scrollView}>
         <Text style={styles.title}>VIRTUAL TPB</Text>
-
-        <Navbar />
-
         <View style={styles.content}>
           <Text style={styles.contentTitle}>DAFTAR MATERI FISIKA DASAR</Text>
           <Text style={styles.contentSubtitle}>Materi yang berkaitan dengan Fisika Dasar IA</Text>
@@ -41,7 +48,7 @@ export default function App() {
           <View style={styles.subjectGrid}>
             <SubjectBox
               title="Gerak"
-              description="Materi tentang gerak benda"
+              description="Materi gerak benda"
               icon="nuclear-outline"
               isActive={true}
               onPressMateri={() => router.push('/(tabs)/materi/materigerak')}
@@ -69,8 +76,11 @@ export default function App() {
           </View>
         </View>
 
-        <Text style={styles.footer}>Developed by Hartanto Luwis</Text>
+        <Text style={styles.footer}>Developed by Hartanto & Louis</Text>
       </ScrollView>
+      <View style={styles.navbarContainer}>
+        <Navbar />
+      </View>
     </SafeAreaView>
   );
 }
@@ -88,19 +98,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#F0F8FF',
+    color: '#00ADB5',
     marginTop: 40,
     marginBottom: 20,
     letterSpacing: 5,
-  },
-
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingVertical: 15,
-    backgroundColor: 'rgba(57, 62, 70, 0.3)',
-    borderRadius: 25,
-    marginBottom: 20,
   },
   navLinkContainer: {
     paddingHorizontal: 10,
@@ -121,14 +122,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   
-//   navLinkContainer: {
-//     paddingHorizontal: 10,
-//   },
-//   navLink: {
-//     color: '#FFFFFF',
-//     fontSize: 16,
-//     fontWeight: '500',
-//   },
   content: {
     width: '90%',
     alignItems: 'center',
@@ -136,7 +129,7 @@ const styles = StyleSheet.create({
   contentTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#F0F8FF',
+    color: '#00ADB5',
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -185,10 +178,11 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     backgroundColor: '#00ADB5',
-    padding: 10,
+    padding: 6,
+    paddingVertical: 8,
     borderRadius: 15,
     flex: 1,
-    marginHorizontal: 5,
+    marginHorizontal: 4,
     alignItems: 'center',
   },
   buttonDisabled: {
@@ -198,5 +192,12 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 14,
     color: '#F0F8FF',
+  },
+  navbarContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#222831',
   },
 });

@@ -19,6 +19,10 @@ export default function Layout() {
       //   tabBarInactiveTintColor: "gray",
       //   headerShown: false,
       // })}
+      screenOptions={{
+        tabBarStyle: { display: 'none' }, // Menyembunyikan tab bar
+        headerShown: false, // Menyembunyikan header default
+      }}
     >
       <Tabs.Screen name="dashboard" />
       <Tabs.Screen name="login" />
