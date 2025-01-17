@@ -1,17 +1,29 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true,
+    "target": "ESNext",                // Kompatibel dengan fitur JavaScript terbaru
+    "module": "ESNext",                // Menggunakan module system modern
+    "jsx": "react-native",             // Konfigurasi khusus untuk React Native
+    "strict": true,                    // Mengaktifkan mode ketat TypeScript
+    "esModuleInterop": true,           // Mengatasi error `default-import` pada modul CommonJS
+    "allowSyntheticDefaultImports": true, // Mendukung default import dari modul CommonJS
+    "moduleResolution": "node",        // Resolusi modul berbasis Node.js
+    "baseUrl": ".",                    // Base path untuk import relatif
     "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
+      "@/*": ["./*"]                   // Alias untuk path relatif
+    },
+    "skipLibCheck": true,              // Mengabaikan pemeriksaan file deklarasi (untuk mempercepat build)
+    "forceConsistentCasingInFileNames": true // Konsistensi casing pada file
   },
   "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",                    // Mengabaikan node_modules
+    "babel.config.js",                 // Konfigurasi Babel tidak diperlukan di TypeScript
+    "metro.config.js"                  // Konfigurasi Metro tidak diperlukan
   ]
 }
