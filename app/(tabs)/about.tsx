@@ -11,7 +11,7 @@ const About: React.FC = () => {
         <Text style={styles.title}>About Us</Text>
         <View style={styles.aboutCard}>
           <Ionicons name="information-circle-outline" size={80} color="#00ADB5" />
-          <Text style={styles.aboutTitle}>who are we?</Text>
+          <Text style={styles.aboutTitle}>Who We Are</Text>
           <Text style={styles.aboutDescription}>
             We are a group of passionate individuals working together to create innovative solutions
             for businesses and education. Our goal is to make the world more connected and accessible.
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   aboutTitle: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#EEEEEE',
     marginTop: 10,

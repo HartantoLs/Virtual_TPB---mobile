@@ -75,7 +75,7 @@ export default function App() {
           </View>
         </View>
 
-        <Text style={styles.footer}>Developed by Hartanto & Louis</Text>
+        <Text style={styles.footer}>Developed by Hartanto Luwis</Text>
       </ScrollView>
       <View style={styles.navbarContainer}>
         <Navbar />
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#00ADB5',
+    color: '#F0F8FF',
     marginTop: 40,
     marginBottom: 20,
     letterSpacing: 5,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   contentTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#00ADB5',
+    color: '#F0F8FF',
     marginBottom: 10,
     textAlign: 'center',
   },
@@ -177,11 +177,10 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     backgroundColor: '#00ADB5',
-    padding: 6,
-    paddingVertical: 8,
+    padding: 10,
     borderRadius: 15,
     flex: 1,
-    marginHorizontal: 4,
+    marginHorizontal: 5,
     alignItems: 'center',
   },
   buttonDisabled: {
